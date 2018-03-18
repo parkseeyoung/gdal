@@ -121,11 +121,19 @@ void ImgLabel::mouseMoveEvent(QMouseEvent *event)
 
     //思路二
     //始终保持鼠标所对应的像素不变
-    point_leftTop.setX(ltX-(qreal)event->pos().x()/(qreal)this->width()*pix_width/m_scale);
-    point_leftTop.setY(ltY-(qreal)event->pos().y()/(qreal)this->height()*pix_height/m_scale);
+    qreal pltX = ltX-(qreal)event->pos().x()/(qreal)this->width()*pix_width/m_scale;
+    qreal pltY = ltY-(qreal)event->pos().y()/(qreal)this->height()*pix_height/m_scale;
+    qreal prbX = ltX-(qreal)event->pos().x()/(qreal)this->width()*pix_width/m_scale+pix_width/m_scale;
+    qreal prbY = ltY-(qreal)event->pos().y()/(qreal)this->height()*pix_height/m_scale+pix_height/m_scale;
 
-    point_rightBottom.setX(ltX-(qreal)event->pos().x()/(qreal)this->width()*pix_width/m_scale+pix_width/m_scale);
-    point_rightBottom.setY(ltY-(qreal)event->pos().y()/(qreal)this->height()*pix_height/m_scale+pix_height/m_scale);
+    if(pltX<=0||pltY<=0||prbX>=pix_width||prbY>=pix_height)
+        return;
+
+    point_leftTop.setX(pltX);
+    point_leftTop.setY(pltY);
+
+    point_rightBottom.setX(prbX);
+    point_rightBottom.setY(prbY);
 
     //qDebug()<<QString::fromLocal8Bit("该点的像素:")<<(qreal)event->pos().x()/this->width()*(point_rightBottom.x()-point_leftTop.x())+point_leftTop.x();
     m_curPos = event->pos();

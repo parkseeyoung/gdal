@@ -22,11 +22,11 @@ private:
     //文件路径
     QString m_filePath;
     //图片的总像素大小
-    int pix_width;
-    int pix_height;
+    qreal pix_width;
+    qreal pix_height;
     //label左上和右下角所对应的图片的像素
-    QPoint point_leftTop;
-    QPoint point_rightBottom;
+    QPointF point_leftTop;
+    QPointF point_rightBottom;
 
     //Dataset
     GDALDataset *m_pDataset;

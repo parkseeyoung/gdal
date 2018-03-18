@@ -87,28 +87,48 @@ void ImgLabel::mouseMoveEvent(QMouseEvent *event)
 {
     if(m_scale==1)
         return;
+    QPointF curPoint = m_curPos;
+
+
+    //之前点的实际像素
+    qreal ltX = (qreal)curPoint.x()/this->width()*(point_rightBottom.x()-point_leftTop.x())+point_leftTop.x();
+    qreal ltY = (qreal)curPoint.y()/this->height()*(point_rightBottom.y()-point_leftTop.y())+point_leftTop.y();
+
+    //思路一
     //通过移动的距离计算移动的像素
-    qreal changeX = event->pos().x() - m_curPos.x();
-    qreal changeY = event->pos().y() - m_curPos.y();
+    //先计算curPos点的像素，它等于现在的pos的像素，从而计算出左上和右下
+//    qreal pltX = ltX - pix_width/m_scale*(event->pos().x()/(qreal)(this->width()))/m_scale;
+//    qreal pltY = ltY - pix_height/m_scale*(event->pos().y()/(qreal)(this->height()))/m_scale;
 
-    qDebug()<<changeX<<changeY;
 
-    //当前像素宽和高
-    int p_pixWidth = point_rightBottom.x()-point_leftTop.x();
-    int p_pixHeight = point_rightBottom.y()-point_leftTop.y();
+//    qreal prbX = pltX + pix_width/m_scale;
+//    qreal prbY = pltY + pix_height/m_scale;
 
-    qreal changePixX = changeX * p_pixWidth/this->width()/m_scale/m_scale;
-    qreal changePixY = (qreal)changeY * p_pixHeight/this->height()/m_scale/m_scale;
+//    //
+//    pltX = point_leftTop.x()-(event->pos().x()-m_curPos.x())/(qreal)width()*pix_width/m_scale;
+//    pltY = point_leftTop.y()-(event->pos().y()-m_curPos.y())/(qreal)height()*pix_height/m_scale;
 
-    qDebug()<<p_pixWidth<<p_pixHeight<<changePixX<<changePixY;
-    int ltX = point_leftTop.x() - changePixX;
-    int ltY = point_leftTop.y() - changePixY;
-    int rbX = point_rightBottom.x() - changePixX;
-    int rbY = point_rightBottom.y() - changePixY;
-    if(ltX<=0||ltY<=0||rbX>=pix_width||rbY>=pix_height)
-        return;
-    point_leftTop = QPoint(ltX,ltY);
-    point_rightBottom = QPoint(rbX,rbY);
+//    prbX = point_rightBottom.x()-(event->pos().x()-m_curPos.x())/(qreal)width()*pix_width/m_scale;
+//    prbY = point_rightBottom.y()-(event->pos().y()-m_curPos.y())/(qreal)height()*pix_height/m_scale;
+//    //
+//    point_leftTop.setX(pltX);
+//    point_leftTop.setY(pltY);
+
+//    point_rightBottom.setX(prbX);
+//    point_rightBottom.setY(prbY);
+
+//    qDebug()<<"m_scale is "<<m_scale;
+
+    //思路二
+    //始终保持鼠标所对应的像素不变
+    point_leftTop.setX(ltX-(qreal)event->pos().x()/(qreal)this->width()*pix_width/m_scale);
+    point_leftTop.setY(ltY-(qreal)event->pos().y()/(qreal)this->height()*pix_height/m_scale);
+
+    point_rightBottom.setX(ltX-(qreal)event->pos().x()/(qreal)this->width()*pix_width/m_scale+pix_width/m_scale);
+    point_rightBottom.setY(ltY-(qreal)event->pos().y()/(qreal)this->height()*pix_height/m_scale+pix_height/m_scale);
+
+    //qDebug()<<QString::fromLocal8Bit("该点的像素:")<<(qreal)event->pos().x()/this->width()*(point_rightBottom.x()-point_leftTop.x())+point_leftTop.x();
+    m_curPos = event->pos();
     showImg();
 }
 
@@ -117,14 +137,14 @@ void ImgLabel::wheelEvent(QWheelEvent *event)
     if(event->delta()>0)
     {
 
-        m_scale +=0.1;
+        m_scale +=0.2;
         calPix(event->pos());
         qDebug()<<QString::fromLocal8Bit("向上滚了")<<m_scale;
     }
     else if(event->delta() < 0)
     {
 
-        m_scale -=0.1;
+        m_scale -=0.2;
         calPix(event->pos());
         qDebug()<<QString::fromLocal8Bit("向下滚了")<<m_scale;
     }
@@ -140,8 +160,8 @@ void ImgLabel::calPix(QPoint curPoint)
            <<point_rightBottom;
     //有个总的width也就是像素，根据比例放大或缩小
     //当前点的实际像素
-    int ltX = (qreal)curPoint.x()/this->width()*(point_rightBottom.x()-point_leftTop.x())+point_leftTop.x();
-    int ltY = (qreal)curPoint.y()/this->height()*(point_rightBottom.y()-point_leftTop.y())+point_leftTop.y();
+    qreal ltX = (qreal)curPoint.x()/(qreal)this->width()*(point_rightBottom.x()-point_leftTop.x())+point_leftTop.x();
+    qreal ltY = (qreal)curPoint.y()/(qreal)this->height()*(point_rightBottom.y()-point_leftTop.y())+point_leftTop.y();
     //当前点相对于窗体的比例
     qreal rateX = (qreal)curPoint.x()/this->width();
     qreal rateY = (qreal)curPoint.y()/this->height();
@@ -154,10 +174,10 @@ void ImgLabel::calPix(QPoint curPoint)
 
     qDebug()<<QString::fromLocal8Bit("计算经过scale后的实际像素宽和高")<<pixW<<","<<pixH;
 
-    int x1 = ltX-rateX*pixW;
-    int y1 = ltY-rateY*pixH;
-    int x2 = x1+pixW;
-    int y2 = y1+pixH;
+    qreal x1 = ltX-rateX*pixW;
+    qreal y1 = ltY-rateY*pixH;
+    qreal x2 = x1+pixW;
+    qreal y2 = y1+pixH;
 
     if(x1<=0)
         x1=0;

@@ -13,6 +13,21 @@ public:
     ~Widget();
 private:
     ImgLabel * imgLab;
+    //菜单
+    QMenuBar * m_MenuBar;
+
+    //文件路径
+    QString filepath;
+
+private:
+    //初始化菜单
+    void iniMenu();
+    //布局
+    void iniLayout();
+
+private slots:
+    void slot_act_openfile();
+    void slot_act_pickupPic();
 
 };
 

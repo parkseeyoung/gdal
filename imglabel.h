@@ -2,12 +2,12 @@
 #define IMGLABEL_H
 #include <QLabel>
 #include "gdal_priv.h"
-
+#include <QVector>
 class ImgLabel : public QLabel
 {
     Q_OBJECT
 public:
-    ImgLabel(QString _filePath,QWidget *parent);
+    ImgLabel(QString _filePath,QWidget *parent=0);
     ~ImgLabel();
 private:
     void wheelEvent(QWheelEvent * event);
@@ -17,6 +17,8 @@ private:
     void mouseMoveEvent(QMouseEvent * event);
     //转化函数
     void calPix(QPoint curPoint);
+    //绘图（用于显示抠图的点）
+    void paintEvent(QPaintEvent *event);
 
 private:
     //文件路径
@@ -35,11 +37,20 @@ private:
 
     //当前鼠标点击的位置
     QPointF m_curPos;
+
+    //开始抠图
+    bool m_pick_up;
+
+    //定义一个容器，放刺出的点的坐标（最后统一计算像素）
+    QVector<QPoint>vec_point;
 public:
     //初始化dataset
     void iniDataset();
 
     void showImg();
+
+    //设置抠图状态
+    void setPickup(bool status);
 };
 
 #endif // IMGLABEL_H

@@ -2,12 +2,15 @@
 #define IMGLABEL_H
 #include <QLabel>
 #include "gdal_priv.h"
+#include "gdalwarper.h"
+#include "ogr_geometry.h"
+#include "gdaljp2metadata.h"
 #include <QVector>
 class ImgLabel : public QLabel
 {
     Q_OBJECT
 public:
-    ImgLabel(QString _filePath,QWidget *parent=0);
+    ImgLabel(QString _filePath=0,QWidget *parent=0);
     ~ImgLabel();
 private:
     void wheelEvent(QWheelEvent * event);
@@ -17,8 +20,20 @@ private:
     void mouseMoveEvent(QMouseEvent * event);
     //转化函数
     void calPix(QPoint curPoint);
+    //切图
+    int ImageCutByAOI(const char* pszDstFile,const char * pszAOIWKT,
+                      const char* pszFormat);
     //绘图（用于显示抠图的点）
     void paintEvent(QPaintEvent *event);
+    //创建JPEG图像
+    GDALDataset * JPEGCreateCopy();
+public:
+    //保存抠图文件
+    void savePic();
+    void setFilePath(QString _filepath)
+    {
+        m_filePath = _filepath;
+    }
 
 private:
     //文件路径
@@ -42,7 +57,7 @@ private:
     bool m_pick_up;
 
     //定义一个容器，放刺出的点的坐标（最后统一计算像素）
-    QVector<QPoint>vec_point;
+    QVector<QPointF>vec_point;
 public:
     //初始化dataset
     void iniDataset();

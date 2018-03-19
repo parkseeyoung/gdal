@@ -2,11 +2,9 @@
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
-    imgLab = new ImgLabel("C:\\Users\\CHEN-LIU\\Desktop\\interview\\Fields_Camomiles_Sky_492698.jpg");
-    imgLab->resize(1000,800);
-    imgLab->iniDataset();
-    imgLab->showImg();
-
+    imgLab = new ImgLabel();
+    filepath ="";
+    resize(1000,800);
     iniMenu();
     iniLayout();
 }
@@ -45,9 +43,36 @@ void Widget::iniLayout()
 }
 void Widget::slot_act_pickupPic()
 {
-
+    if(NULL != imgLab && filepath!="")
+    {
+        imgLab->setPickup(true);
+    }
 }
 void Widget::slot_act_openfile()
 {
-
+    QString p_filepath = QFileDialog::getOpenFileName(this,QString::fromLocal8Bit("选择所要打开的图片"),"","JPG Files (*.jpg)");
+    filepath = p_filepath;
+    if(p_filepath == "")
+        return;
+    imgLab->setFilePath(p_filepath);
+    imgLab->iniDataset();
+    imgLab->showImg();
+}
+void Widget::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    {
+        if(NULL != imgLab)
+        {
+            imgLab->savePic();
+            imgLab->setPickup(false);
+        }
+    }
+}
+void Widget::resizeEvent(QResizeEvent *event)
+{
+    imgLab->resize(event->size());
+    if(filepath!="")
+        imgLab->showImg();
+    QWidget::resizeEvent(event);
 }

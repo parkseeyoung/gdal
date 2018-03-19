@@ -29,6 +29,9 @@ private slots:
     void slot_act_openfile();
     void slot_act_pickupPic();
 
+private:
+    void keyPressEvent(QKeyEvent *event);
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif // WIDGET_H
